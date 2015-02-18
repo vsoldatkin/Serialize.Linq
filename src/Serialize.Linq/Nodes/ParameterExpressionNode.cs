@@ -9,6 +9,7 @@
 #if !WINDOWS_PHONE7
 using System;
 #endif
+using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Serialize.Linq.Interfaces;
@@ -31,6 +32,9 @@ namespace Serialize.Linq.Nodes
 
         public ParameterExpressionNode(INodeFactory factory, ParameterExpression expression)
             : base(factory, expression) { }
+
+        protected ParameterExpressionNode(INodeFactory factory, ExpressionType nodeType, Type type)
+            : base(factory, nodeType, type) { }
 
         #region DataMember
 #if !SERIALIZE_LINQ_OPTIMIZE_SIZE
@@ -59,6 +63,11 @@ namespace Serialize.Linq.Nodes
             this.IsByRef = false;
 #endif
             this.Name = expression.Name;
+        }
+
+        protected override async Task InitializeAsync(ParameterExpression expression)
+        {
+            Initialize(expression);
         }
 
         public override Expression ToExpression(ExpressionContext context)

@@ -7,6 +7,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Serialize.Linq.Exceptions;
@@ -135,6 +136,11 @@ namespace Serialize.Linq.Nodes
         protected override void Initialize(ConstantExpression expression)
         {
             this.Value = expression.Value;
+        }
+
+        protected override async Task InitializeAsync(ConstantExpression expression)
+        {
+            Initialize(expression);
         }
 
         /// <summary>

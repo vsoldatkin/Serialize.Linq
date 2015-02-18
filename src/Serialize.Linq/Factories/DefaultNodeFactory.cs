@@ -7,6 +7,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -53,6 +54,11 @@ namespace Serialize.Linq.Factories
         public ExpressionNode Create(Expression expression)
         {
             return _innerFactory.Create(expression);
+        }
+
+        public async Task<ExpressionNode> CreateAsync(Expression expression)
+        {
+            return await _innerFactory.CreateAsync(expression);
         }
 
         /// <summary>

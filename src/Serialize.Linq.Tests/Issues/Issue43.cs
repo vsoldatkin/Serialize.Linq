@@ -40,7 +40,9 @@ namespace Serialize.Linq.Tests.Issues
                 Expression equalExpression = Expression.MakeBinary(ExpressionType.Equal, propertyExpression, Expression.Constant(idCollection[i]));
                 composedExpression = Expression.MakeBinary(ExpressionType.OrElse, equalExpression, composedExpression);
             }
-            var expressionNode = composedExpression.ToExpressionNode();
+            var expressionNode = composedExpression.ToExpressionNodeAsync().Result;
+
+            Expression result = expressionNode.ToExpression();
         }
     }
 }

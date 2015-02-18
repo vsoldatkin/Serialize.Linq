@@ -7,6 +7,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Serialize.Linq.Interfaces;
@@ -30,6 +31,18 @@ namespace Serialize.Linq.Nodes
         public MemberExpressionNode(INodeFactory factory, MemberExpression expression)
             : base(factory, expression) { }
 
+        protected MemberExpressionNode(INodeFactory factory, ExpressionType nodeType, Type type)
+            : base(factory, nodeType, type) { }
+
+        public static async Task<MemberExpressionNode> CreateAsync(INodeFactory factory, MemberExpression expression)
+        {
+            MemberExpressionNode result = new MemberExpressionNode(factory, expression.NodeType, expression.Type);
+
+            await result.InitializeAsync(expression);
+
+            return result;
+        }
+
         #region DataMember
         #if !SERIALIZE_LINQ_OPTIMIZE_SIZE
         [DataMember(EmitDefaultValue = false)]
@@ -51,6 +64,12 @@ namespace Serialize.Linq.Nodes
         protected override void Initialize(MemberExpression expression)
         {
             this.Expression = this.Factory.Create(expression.Expression);
+            this.Member = new MemberInfoNode(this.Factory, expression.Member);
+        }
+
+        protected override async Task InitializeAsync(MemberExpression expression)
+        {
+            this.Expression = await this.Factory.CreateAsync(expression.Expression);
             this.Member = new MemberInfoNode(this.Factory, expression.Member);
         }
 

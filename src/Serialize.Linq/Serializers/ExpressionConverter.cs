@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Threading.Tasks;
+using System.Linq;
 using System.Linq.Expressions;
 using Serialize.Linq.Factories;
 using Serialize.Linq.Interfaces;
@@ -12,6 +13,12 @@ namespace Serialize.Linq.Serializers
         {
             var factory = this.CreateFactory(expression);
             return factory.Create(expression);
+        }
+
+        public async Task<ExpressionNode> ConvertAsync(Expression expression)
+        {
+            var factory = this.CreateFactory(expression);
+            return await factory.CreateAsync(expression);
         }
 
         protected virtual INodeFactory CreateFactory(Expression expression)

@@ -7,6 +7,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Serialize.Linq.Interfaces;
@@ -30,6 +31,9 @@ namespace Serialize.Linq.Nodes
         public UnaryExpressionNode(INodeFactory factory, UnaryExpression expression)
             : base(factory, expression) { }
 
+        protected UnaryExpressionNode(INodeFactory factory, ExpressionType nodeType, Type type)
+            : base(factory, nodeType, type) { }
+
         #region DataMember
 #if !SERIALIZE_LINQ_OPTIMIZE_SIZE
         [DataMember(EmitDefaultValue = false)]
@@ -40,6 +44,11 @@ namespace Serialize.Linq.Nodes
         public ExpressionNode Operand { get; set; }
 
         protected override void Initialize(UnaryExpression expression)
+        {
+            this.Operand = this.Factory.Create(expression.Operand);
+        }
+
+        protected override async Task InitializeAsync(UnaryExpression expression)
         {
             this.Operand = this.Factory.Create(expression.Operand);
         }

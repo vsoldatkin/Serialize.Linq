@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 #region Copyright
 //  Copyright, Sascha Kiefer (esskar)
 //  Released under LGPL License.
@@ -9,7 +11,6 @@ using System.Linq;
 //  Contributing: https://github.com/esskar/Serialize.Linq
 #endregion
 
-using System.Linq.Expressions;
 using Serialize.Linq.Factories;
 using Serialize.Linq.Interfaces;
 using Serialize.Linq.Nodes;
@@ -31,6 +32,12 @@ namespace Serialize.Linq.Extensions
         {
             var converter = new ExpressionConverter();
             return converter.Convert(expression);
+        }
+
+        public static async Task<ExpressionNode> ToExpressionNodeAsync(this Expression expression)
+        {
+            var converter = new ExpressionConverter();
+            return await converter.ConvertAsync(expression);
         }
 
 #if !SILVERLIGHT

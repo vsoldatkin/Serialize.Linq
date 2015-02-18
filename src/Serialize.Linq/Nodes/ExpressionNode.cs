@@ -7,6 +7,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Serialize.Linq.Interfaces;
@@ -59,6 +60,8 @@ namespace Serialize.Linq.Nodes
         /// </summary>
         /// <param name="expression">The expression.</param>
         protected abstract void Initialize(TExpression expression);
+
+        protected abstract Task InitializeAsync(TExpression expression);
     }
 
     #region DataContract

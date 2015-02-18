@@ -9,6 +9,7 @@
 #if !WINDOWS_PHONE7
 using System;
 #endif
+using System.Threading.Tasks;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
@@ -33,6 +34,18 @@ namespace Serialize.Linq.Nodes
 
         public LambdaExpressionNode(INodeFactory factory, LambdaExpression expression)
             : base(factory, expression) { }
+
+        protected LambdaExpressionNode(INodeFactory factory, ExpressionType nodeType, Type type)
+            : base(factory, nodeType, type) { }
+
+        public static async Task<LambdaExpressionNode> CreateAsync(INodeFactory factory, LambdaExpression expression)
+        {
+            LambdaExpressionNode result = new LambdaExpressionNode(factory, expression.NodeType, expression.Type);
+
+            await result.InitializeAsync(expression);
+
+            return result;
+        }
 
         #region DataMember
 #if !SERIALIZE_LINQ_OPTIMIZE_SIZE
@@ -60,6 +73,16 @@ namespace Serialize.Linq.Nodes
             this.Parameters = new ExpressionNodeList(this.Factory, expression.Parameters.Select(p => (Expression)p));
 #endif
             this.Body = this.Factory.Create(expression.Body);
+        }
+
+        protected override async Task InitializeAsync(LambdaExpression expression)
+        {
+#if !WINDOWS_PHONE7
+            this.Parameters = new ExpressionNodeList(this.Factory, expression.Parameters);
+#else
+            this.Parameters = new ExpressionNodeList(this.Factory, expression.Parameters.Select(p => (Expression)p));
+#endif
+            this.Body = await this.Factory.CreateAsync(expression.Body);
         }
 
         public override Expression ToExpression(ExpressionContext context)

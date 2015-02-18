@@ -7,6 +7,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Serialize.Linq.Interfaces;
@@ -37,6 +38,18 @@ namespace Serialize.Linq.Nodes
         /// <param name="expression">The expression.</param>
         public BinaryExpressionNode(INodeFactory factory, BinaryExpression expression)
             : base(factory, expression) { }
+
+        protected BinaryExpressionNode(INodeFactory factory, ExpressionType nodeType, Type type)
+            : base(factory, nodeType, type) { }
+
+        public static async Task<BinaryExpressionNode> CreateAsync(INodeFactory factory, BinaryExpression expression)
+        {
+            BinaryExpressionNode result = new BinaryExpressionNode(factory, expression.NodeType, expression.Type);
+
+            await result.InitializeAsync(expression);
+
+            return result;
+        }
 
         #region DataMember
 #if !SERIALIZE_LINQ_OPTIMIZE_SIZE
@@ -122,6 +135,19 @@ namespace Serialize.Linq.Nodes
             this.Left = this.Factory.Create(expression.Left);
             this.Right = this.Factory.Create(expression.Right);
             this.Conversion = this.Factory.Create(expression.Conversion);
+            this.Method = new MethodInfoNode(this.Factory, expression.Method);
+            this.IsLiftedToNull = expression.IsLiftedToNull;
+        }
+
+        /// <summary>
+        /// Initializes the specified expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        protected override async Task InitializeAsync(BinaryExpression expression)
+        {
+            this.Left = await this.Factory.CreateAsync(expression.Left);
+            this.Right = await this.Factory.CreateAsync(expression.Right);
+            this.Conversion = await this.Factory.CreateAsync(expression.Conversion);
             this.Method = new MethodInfoNode(this.Factory, expression.Method);
             this.IsLiftedToNull = expression.IsLiftedToNull;
         }

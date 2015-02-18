@@ -7,6 +7,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
@@ -30,6 +31,9 @@ namespace Serialize.Linq.Nodes
 
         public NewExpressionNode(INodeFactory factory, NewExpression expression)
             : base(factory, expression) { }
+
+        protected NewExpressionNode(INodeFactory factory, ExpressionType nodeType, Type type)
+            : base(factory, nodeType, type) { }
 
         #region DataMember
 #if !SERIALIZE_LINQ_OPTIMIZE_SIZE
@@ -63,6 +67,11 @@ namespace Serialize.Linq.Nodes
             this.Arguments = new ExpressionNodeList(this.Factory, expression.Arguments);
             this.Constructor = new ConstructorInfoNode(this.Factory, expression.Constructor);
             this.Members = new MemberInfoNodeList(this.Factory, expression.Members);
+        }
+
+        protected override async Task InitializeAsync(NewExpression expression)
+        {
+            Initialize(expression);
         }
 
         public override Expression ToExpression(ExpressionContext context)

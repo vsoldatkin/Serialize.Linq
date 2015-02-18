@@ -7,6 +7,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using System.Linq.Expressions;
 using Serialize.Linq.Nodes;
 
@@ -20,6 +21,8 @@ namespace Serialize.Linq.Interfaces
         /// <param name="expression">The expression.</param>
         /// <returns></returns>
         ExpressionNode Create(Expression expression);
+
+        Task<ExpressionNode> CreateAsync(Expression expression);
 
         /// <summary>
         /// Creates the specified type node from a type.

@@ -7,6 +7,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Serialize.Linq.Interfaces;
@@ -31,6 +32,18 @@ namespace Serialize.Linq.Nodes
         public TypeBinaryExpressionNode(INodeFactory factory, TypeBinaryExpression expression)
             : base(factory, expression) { }
 
+        protected TypeBinaryExpressionNode(INodeFactory factory, ExpressionType nodeType, Type type)
+            : base(factory, nodeType, type) { }
+
+        public static async Task<TypeBinaryExpressionNode> CreateAsync(INodeFactory factory, TypeBinaryExpression expression)
+        {
+            TypeBinaryExpressionNode result = new TypeBinaryExpressionNode(factory, expression.NodeType, expression.Type);
+
+            await result.InitializeAsync(expression);
+
+            return result;
+        }
+
         #region DataMember
 #if !SERIALIZE_LINQ_OPTIMIZE_SIZE
         [DataMember(EmitDefaultValue = false)]
@@ -53,6 +66,12 @@ namespace Serialize.Linq.Nodes
         protected override void Initialize(TypeBinaryExpression expression)
         {
             this.Expression = this.Factory.Create(expression.Expression);
+            this.TypeOperand = this.Factory.Create(expression.TypeOperand);
+        }
+
+        protected override async Task InitializeAsync(TypeBinaryExpression expression)
+        {
+            this.Expression = await this.Factory.CreateAsync(expression.Expression);
             this.TypeOperand = this.Factory.Create(expression.TypeOperand);
         }
 

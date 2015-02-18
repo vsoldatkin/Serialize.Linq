@@ -7,6 +7,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Serialize.Linq.Interfaces;
@@ -29,6 +30,18 @@ namespace Serialize.Linq.Nodes
 
         public ConditionalExpressionNode(INodeFactory factory, ConditionalExpression expression)
             : base(factory, expression) { }
+
+        protected ConditionalExpressionNode(INodeFactory factory, ExpressionType nodeType, Type type)
+            : base(factory, nodeType, type) { }
+
+        public static async Task<ConditionalExpressionNode> CreateAsync(INodeFactory factory, ConditionalExpression expression)
+        {
+            ConditionalExpressionNode result = new ConditionalExpressionNode(factory, expression.NodeType, expression.Type);
+
+            await result.InitializeAsync(expression);
+
+            return result;
+        }
 
         #region DataMember
 #if !SERIALIZE_LINQ_OPTIMIZE_SIZE
@@ -66,6 +79,13 @@ namespace Serialize.Linq.Nodes
             this.Test = this.Factory.Create(expression.Test);
             this.IfTrue = this.Factory.Create(expression.IfTrue);
             this.IfFalse = this.Factory.Create(expression.IfFalse);
+        }
+
+        protected override async Task InitializeAsync(ConditionalExpression expression)
+        {
+            this.Test = await this.Factory.CreateAsync(expression.Test);
+            this.IfTrue = await this.Factory.CreateAsync(expression.IfTrue);
+            this.IfFalse = await this.Factory.CreateAsync(expression.IfFalse);
         }
 
         /// <summary>
